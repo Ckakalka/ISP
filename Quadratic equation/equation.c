@@ -1,10 +1,7 @@
-#include "equation.h"
 #include <math.h>
 #include <errno.h>
 #include <float.h>
-
-#define INFINITE_ROOTS 3
-#define NULL_PTR_EXC -1
+#include "equation.h"
 
 /**
  * Функция для решения квадратного уравнения ax^2 + bx + c = 0.
@@ -14,8 +11,7 @@
  * @param x_1 Указатель на первый корень (не NULL)
  * @param x_2 Указатель на второй корень (не NULL)
  * @return При успешном выполнении возвращает количество корней. Значение 3 означает бесконечное количество корней.
- * @return Значение -1 означает возникновение ошибки: обращение к нулевому указателю.
- * @return Также устанавливается значение переменной errno в EDOM.
+ * @return Значение -1 означает возникновение ошибки: обращение к нулевому указателю, также устанавливается значение переменной errno в EDOM.
  */
 int solve_quadratic_eq(double a, double b, double c, double *x_1, double *x_2)
 {
@@ -58,10 +54,9 @@ int solve_quadratic_eq(double a, double b, double c, double *x_1, double *x_2)
  * @param b Свободный член
  * @param x Указатель на корень
  * @return При успешном возвращении возвращает количество корней. Значение 3 означает бесконечное количество корней.
- * @return Значение -1 означает возникновение ошибки: обращение к нулевому указателю.
- * @return Также устанавливается значение переменной errno в EDOM.
+ * @return Значение -1 означает возникновение ошибки: обращение к нулевому указателю, также устанавливается значение переменной errno в EDOM.
  */
-int solve_linear_eq(double a, double b, double* x)
+int solve_linear_eq(double a, double b, double *x)
 {
     errno = 0;
     if (is_zero(a))
@@ -91,5 +86,5 @@ int solve_linear_eq(double a, double b, double* x)
  */
 int is_zero(double a)
 {
-	return fabs(a) <= 16 * fabs(a) * DBL_EPSILON;
+    return fabs(a) <= EPSILON;
 }
