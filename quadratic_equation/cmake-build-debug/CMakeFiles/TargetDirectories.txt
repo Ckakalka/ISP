@@ -1,3 +1,0 @@
-C:/Users/User/Documents/3 course/ISP/Homeworks/ISP/quadratic_equation/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/User/Documents/3 course/ISP/Homeworks/ISP/quadratic_equation/cmake-build-debug/CMakeFiles/Quadratic_equation.dir
-C:/Users/User/Documents/3 course/ISP/Homeworks/ISP/quadratic_equation/cmake-build-debug/CMakeFiles/rebuild_cache.dir

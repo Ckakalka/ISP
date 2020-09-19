@@ -7,6 +7,10 @@
 *.obj
 *.elf
 
+# Ignore IDE specific files
+.idea/
+cmake-build-debug/
+
 # Linker output
 *.ilk
 *.map
