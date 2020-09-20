@@ -1,0 +1,87 @@
+\hypertarget{equation_8h}{}\doxysection{C\+:/\+Users/\+User/\+Documents/3 course/\+I\+S\+P/\+Homeworks/\+I\+S\+P/quadratic\+\_\+equation/src/equation.h File Reference}
+\label{equation_8h}\index{C:/Users/User/Documents/3 course/ISP/Homeworks/ISP/quadratic\_equation/src/equation.h@{C:/Users/User/Documents/3 course/ISP/Homeworks/ISP/quadratic\_equation/src/equation.h}}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{equation_8h_ad309e3cd756c77909f1812091d85c9f9}\label{equation_8h_ad309e3cd756c77909f1812091d85c9f9}} 
+\#define {\bfseries I\+N\+F\+I\+N\+I\+T\+E\+\_\+\+R\+O\+O\+TS}~3
+\item 
+\mbox{\Hypertarget{equation_8h_a8e5fdcdfe948aeed8558f0d81392e941}\label{equation_8h_a8e5fdcdfe948aeed8558f0d81392e941}} 
+\#define {\bfseries E\+X\+C\+E\+P\+T\+I\+ON}~-\/1
+\item 
+\mbox{\Hypertarget{equation_8h_a002b2f4894492820fe708b1b7e7c5e70}\label{equation_8h_a002b2f4894492820fe708b1b7e7c5e70}} 
+\#define {\bfseries E\+P\+S\+I\+L\+ON}~8 $\ast$ D\+B\+L\+\_\+\+M\+IN
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{equation_8h_ab90b56ffcdc59c471f5557757d72c9f2}{solve\+\_\+linear\+\_\+eq}} (double, double, double $\ast$)
+\item 
+int \mbox{\hyperlink{equation_8h_ace211c1cffce026e707d0287f0b5c53d}{solve\+\_\+quadratic\+\_\+eq}} (double, double, double, double $\ast$, double $\ast$)
+\item 
+int \mbox{\hyperlink{equation_8h_a86db2e8208d67e840793595aadcaaf11}{is\+\_\+zero}} (double a)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Header file with description of functions for solving a quadratic equation 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{equation_8h_a86db2e8208d67e840793595aadcaaf11}\label{equation_8h_a86db2e8208d67e840793595aadcaaf11}} 
+\index{equation.h@{equation.h}!is\_zero@{is\_zero}}
+\index{is\_zero@{is\_zero}!equation.h@{equation.h}}
+\doxysubsubsection{\texorpdfstring{is\_zero()}{is\_zero()}}
+{\footnotesize\ttfamily int is\+\_\+zero (\begin{DoxyParamCaption}\item[{double}]{a }\end{DoxyParamCaption})}
+
+Checking a floating-\/point number for zero 
+\begin{DoxyParams}{Parameters}
+{\em a} & Number to check \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns 1 if the number is zero, otherwise 0. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{equation_8h_ab90b56ffcdc59c471f5557757d72c9f2}\label{equation_8h_ab90b56ffcdc59c471f5557757d72c9f2}} 
+\index{equation.h@{equation.h}!solve\_linear\_eq@{solve\_linear\_eq}}
+\index{solve\_linear\_eq@{solve\_linear\_eq}!equation.h@{equation.h}}
+\doxysubsubsection{\texorpdfstring{solve\_linear\_eq()}{solve\_linear\_eq()}}
+{\footnotesize\ttfamily int solve\+\_\+linear\+\_\+eq (\begin{DoxyParamCaption}\item[{double}]{a,  }\item[{double}]{b,  }\item[{double $\ast$}]{x }\end{DoxyParamCaption})}
+
+Function for solving a linear equation ax + b = 0. 
+\begin{DoxyParams}{Parameters}
+{\em a} & Coefficient of the unknown \\
+\hline
+{\em b} & Free term \\
+\hline
+{\em x} & Pointer to the root (not N\+U\+LL) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns the number of roots on success. A value of 3 means an infinite number of roots. 
+
+A value of -\/1 indicates that an error occurred, the value of the errno variable in E\+D\+OM is also set. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{equation_8h_ace211c1cffce026e707d0287f0b5c53d}\label{equation_8h_ace211c1cffce026e707d0287f0b5c53d}} 
+\index{equation.h@{equation.h}!solve\_quadratic\_eq@{solve\_quadratic\_eq}}
+\index{solve\_quadratic\_eq@{solve\_quadratic\_eq}!equation.h@{equation.h}}
+\doxysubsubsection{\texorpdfstring{solve\_quadratic\_eq()}{solve\_quadratic\_eq()}}
+{\footnotesize\ttfamily int solve\+\_\+quadratic\+\_\+eq (\begin{DoxyParamCaption}\item[{double}]{a,  }\item[{double}]{b,  }\item[{double}]{c,  }\item[{double $\ast$}]{x\+\_\+1,  }\item[{double $\ast$}]{x\+\_\+2 }\end{DoxyParamCaption})}
+
+Function for solving a quadratic equation ax$^\wedge$2 + bx + c = 0. 
+\begin{DoxyParams}{Parameters}
+{\em a} & Leading coefficient \\
+\hline
+{\em b} & Average coefficient \\
+\hline
+{\em c} & Free term \\
+\hline
+{\em x\+\_\+1} & Pointer to the first root (not N\+U\+LL) \\
+\hline
+{\em x\+\_\+2} & Pointer to the second root (not N\+U\+LL) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns the number of roots on success. A value of 3 means an infinite number of roots. 
+
+A value of -\/1 indicates that an error occurred, the value of the errno variable in E\+D\+OM is also set. 
+\end{DoxyReturn}
