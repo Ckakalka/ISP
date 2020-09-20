@@ -14,3 +14,11 @@ cmake -S ./ -B ./Temp
 cmake --build ./Temp
 ```
 Executable file will be located: PATH_TO_REPOSITORY\Temp\Debug\Quadratic_equation.exe
+
+### Documentation
+To create documentation enter (you must have doxygen and environment variables configured):
+```
+cd PATH_TO_REPOSITORY
+doxygen Doxyfile
+```
+Documentation will be located: PATH_TO_REPOSITORY\documentation\
