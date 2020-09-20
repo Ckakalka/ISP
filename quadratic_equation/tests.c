@@ -4,29 +4,27 @@
 #include "stdio.h"
 #include "float.h"
 
-void run_all_tests()
+void run_all_tests(void)
 {
-    void (*tests[TESTS_COUNT])();
+    void (*tests[TESTS_COUNT])(void);
 
     tests[0]  = is_zero_test_1;
-    tests[1]  = is_zero_test_2;
-    tests[2]  = is_zero_test_3;
-    tests[3]  = simple_linear_eq_test_1;
-    tests[4]  = simple_linear_eq_test_2;
-    tests[5]  = no_solution_linear_eq_test;
-    tests[6]  = infinity_roots_linear_eq_test;
-    tests[7]  = null_ptr_linear_eq_test;
-    tests[8]  = simple_quadratic_eq_test;
-    tests[9]  = one_root_quadratic_eq_test;
-    tests[10] = negative_discriminant_quadratic_eq_test;
-    tests[11] = null_ptr_quadratic_eq_test;
-    tests[12] = quadratic_to_linear_eq_test;
+    tests[1]  = simple_linear_eq_test_1;
+    tests[2]  = simple_linear_eq_test_2;
+    tests[3]  = no_solution_linear_eq_test;
+    tests[4]  = infinity_roots_linear_eq_test;
+    tests[5]  = null_ptr_linear_eq_test;
+    tests[6]  = simple_quadratic_eq_test;
+    tests[7]  = one_root_quadratic_eq_test;
+    tests[8] = negative_discriminant_quadratic_eq_test;
+    tests[9] = null_ptr_quadratic_eq_test;
+    tests[10] = quadratic_to_linear_eq_test;
 
     for(int i = 0; i < TESTS_COUNT; ++i)
         tests[i]();
 }
 
-void is_zero_test_1()
+static void is_zero_test_1(void)
 {
     double a = 5 * DBL_MIN;
     if(is_zero(a))
@@ -35,25 +33,7 @@ void is_zero_test_1()
         printf("\nis_zero_test_1 failed\n\n");
 }
 
-void is_zero_test_2()
-{
-    double a = 9 * DBL_MIN;
-    if(!is_zero(a))
-        printf("is_zero_test_2 is successful\n");
-    else
-        printf("\nis_zero_test_2 failed\n\n");
-}
-
-void is_zero_test_3()
-{
-    double a = 8 * DBL_MIN;
-    if(is_zero(a))
-        printf("is_zero_test_3 is successful\n");
-    else
-        printf("\nis_zero_test_3 failed\n\n");
-}
-
-void simple_linear_eq_test_1()
+static void simple_linear_eq_test_1(void)
 {
     double a = 2;
     double b = 8;
@@ -75,7 +55,7 @@ void simple_linear_eq_test_1()
     printf("simple_linear_eq_test_1 is successful\n");
 }
 
-void simple_linear_eq_test_2()
+static void simple_linear_eq_test_2(void)
 {
     double a = 375;
     double b = 16;
@@ -97,7 +77,7 @@ void simple_linear_eq_test_2()
     printf("simple_linear_eq_test_2 is successful\n");
 }
 
-void no_solution_linear_eq_test()
+static void no_solution_linear_eq_test(void)
 {
     double a = 0;
     double b = 2;
@@ -117,7 +97,7 @@ void no_solution_linear_eq_test()
     printf("no_solution_linear_eq_test is successful\n");
 }
 
-void infinity_roots_linear_eq_test()
+static void infinity_roots_linear_eq_test(void)
 {
     double a = 0;
     double b = 0;
@@ -137,21 +117,21 @@ void infinity_roots_linear_eq_test()
     printf("infinity_roots_linear_eq_test is successful\n");
 }
 
-void null_ptr_linear_eq_test()
+static void null_ptr_linear_eq_test(void)
 {
     double a = 21;
     double b = 0;
     double *x = NULL;
     int roots_count = solve_linear_eq(a, b, x);
-    if(errno && roots_count == NULL_PTR_EXC)
+    if(errno && roots_count == EXCEPTION)
         printf("null_ptr_linear_eq_test is successful\n");
     else
         printf("\nnull_ptr_linear_eq_test failed: wrong result!\n"
-               "Expected roots count: NULL_PTR_EXC. Actual roots count: %d\n"
+               "Expected roots count: EXCEPTION. Actual roots count: %d\n"
                "Expected errno = EDOM(33). Actual errno = %d\n\n", roots_count, errno);
 }
 
-void simple_quadratic_eq_test()
+static void simple_quadratic_eq_test(void)
 {
     double a = 2;
     double b = 5;
@@ -177,7 +157,7 @@ void simple_quadratic_eq_test()
     printf("simple_quadratic_eq_test is successful\n");
 }
 
-void one_root_quadratic_eq_test()
+static void one_root_quadratic_eq_test(void)
 {
     double a = 1;
     double b = 8;
@@ -202,7 +182,7 @@ void one_root_quadratic_eq_test()
     printf("one_root_quadratic_eq_test is successful\n");
 }
 
-void negative_discriminant_quadratic_eq_test()
+static void negative_discriminant_quadratic_eq_test(void)
 {
     double a = 2;
     double b = 5;
@@ -226,7 +206,7 @@ void negative_discriminant_quadratic_eq_test()
     printf("negative_discriminant_quadratic_eq_test is successful\n");
 }
 
-void null_ptr_quadratic_eq_test()
+static void null_ptr_quadratic_eq_test(void)
 {
     double a = 2;
     double b = 5;
@@ -236,15 +216,15 @@ void null_ptr_quadratic_eq_test()
 
     int roots_count = solve_quadratic_eq(a, b, c, x_1, x_2);
 
-    if(errno && roots_count == NULL_PTR_EXC)
+    if(errno && roots_count == EXCEPTION)
         printf("null_ptr_quadratic_eq_test is successful\n");
     else
         printf("\nnull_ptr_quadratic_eq_test failed: wrong result!\n"
-               "Expected roots count: NULL_PTR_EXC. Actual roots count: %d\n"
+               "Expected roots count: EXCEPTION. Actual roots count: %d\n"
                "Expected errno = EDOM(33). Actual errno = %d\n\n", roots_count, errno);
 }
 
-void quadratic_to_linear_eq_test()
+static void quadratic_to_linear_eq_test(void)
 {
     double a = 0;
     double b = 5;

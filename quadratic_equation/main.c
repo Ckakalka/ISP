@@ -1,11 +1,8 @@
 #include "tests.h"
-#include <locale.h>
 
-int main()
+int main(void)
 {
-    setlocale(LC_ALL, "Russian");
     run_all_tests();
-
     return 0;
 }
 

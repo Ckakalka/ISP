@@ -2,6 +2,7 @@
 Program for solving a quadratic equation
 
 ## Getting Started
+Project was developed in Windows 10
 
 ### Project assembly
 1. Make sure that you have Cmake installed (https://cmake.org/)

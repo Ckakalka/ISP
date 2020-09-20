@@ -2,19 +2,24 @@
 #include <errno.h>
 #include <float.h>
 #include "equation.h"
+#include <assert.h>
 
 /**
- * Функция для решения квадратного уравнения ax^2 + bx + c = 0.
- * @param a Старший коэффициент
- * @param b Средний коэффициент
- * @param c Свободный член
- * @param x_1 Указатель на первый корень (не NULL)
- * @param x_2 Указатель на второй корень (не NULL)
- * @return При успешном выполнении возвращает количество корней. Значение 3 означает бесконечное количество корней.
- * @return Значение -1 означает возникновение ошибки: обращение к нулевому указателю, также устанавливается значение переменной errno в EDOM.
+ * Function for solving a quadratic equation ax^2 + bx + c = 0.
+ * @param a Leading coefficient
+ * @param b Average coefficient
+ * @param c Free term
+ * @param x_1 Pointer to the first root (not NULL)
+ * @param x_2 Pointer to the second root (not NULL)
+ * @return Returns the number of roots on success. A value of 3 means an infinite number of roots.
+ * @return A value of -1 indicates that an error occurred, the value of the errno variable in EDOM is also set.
  */
 int solve_quadratic_eq(double a, double b, double c, double *x_1, double *x_2)
 {
+    assert(isfinite(a));
+    assert(isfinite(b));
+    assert(isfinite(c));
+
     if (is_zero(a))
         return solve_linear_eq(b, c, x_1);
     else
@@ -22,13 +27,19 @@ int solve_quadratic_eq(double a, double b, double c, double *x_1, double *x_2)
         if (x_1 == NULL || x_2 == NULL)
         {
             errno = EDOM;
-            return NULL_PTR_EXC;
+            return EXCEPTION;
         }
 
         errno = 0;
 
-        // дискриминант
+        // the discriminant
         *x_2 = b * b - 4 * a * c;
+
+        if(!isfinite(*x_2))
+        {
+            errno = EDOM;
+            return EXCEPTION;
+        }
 
         if (is_zero(*x_2))
         {
@@ -39,7 +50,7 @@ int solve_quadratic_eq(double a, double b, double c, double *x_1, double *x_2)
         if (*x_2 < 0)
             return 0;
 
-        // корень из дискриминанта
+        // root of the discriminant
         *x_2 = sqrt(*x_2);
 
         *x_1 = (-b + *x_2) / (2 * a);
@@ -49,15 +60,18 @@ int solve_quadratic_eq(double a, double b, double c, double *x_1, double *x_2)
 }
 
 /**
- * Функция для решения линейного уравнения ax + b = 0.
- * @param a Коэффициент перед неизвестным
- * @param b Свободный член
- * @param x Указатель на корень
- * @return При успешном возвращении возвращает количество корней. Значение 3 означает бесконечное количество корней.
- * @return Значение -1 означает возникновение ошибки: обращение к нулевому указателю, также устанавливается значение переменной errno в EDOM.
+ * Function for solving a linear equation ax + b = 0.
+ * @param a Coefficient of the unknown
+ * @param b Free term
+ * @param x Pointer to the root (not NULL)
+ * @return Returns the number of roots on success. A value of 3 means an infinite number of roots.
+ * @return A value of -1 indicates that an error occurred, the value of the errno variable in EDOM is also set.
  */
 int solve_linear_eq(double a, double b, double *x)
 {
+    assert(isfinite(a));
+    assert(isfinite(b));
+
     errno = 0;
     if (is_zero(a))
     {
@@ -71,18 +85,25 @@ int solve_linear_eq(double a, double b, double *x)
         if (x == NULL)
         {
             errno = EDOM;
-            return NULL_PTR_EXC;
+            return EXCEPTION;
         }
 
         *x = - b / a;
+
+        if(!isfinite(*x))
+        {
+            errno = EDOM;
+            return EXCEPTION;
+        }
+
         return 1;
     }
 }
 
 /**
- * Проверка числа с плавающей точкой на равенство нулю
- * @param a Число, которое необходимо проверить
- * @return Возвращает 1 если число равно нулю, иначе 0.
+ * Checking a floating-point number for zero
+ * @param a Number to check
+ * @return Returns 1 if the number is zero, otherwise 0.
  */
 int is_zero(double a)
 {
