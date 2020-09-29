@@ -9,6 +9,7 @@ project(
 set(CMAKE_C_FLAGS "-Wall -Wextra")
 
 add_subdirectory(src)
+add_subdirectory(tests)
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)

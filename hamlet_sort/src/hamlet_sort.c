@@ -40,14 +40,15 @@ int mmap_data(const char *path, char **text, struct stat *file_info)
 }
 
 /**
- *
- * @param text
- * @param size
- * @param start_lines
- * @param end_lines
- * @param count_lines
- * @return
- */
+* Marks lines of \b text. Each line corresponds to two pointers: to the first symbol and end of line (\\n or last symbol in text).
+* These pointers are placed in address \b start_lines and \b end_lines respectively. Also puts the count of lines in address \b count_lines
+* @param [in] text The text in which the lines are marked (not NULL).
+* @param [in] size The size of the \b text.
+* @param [out] start_lines Address of the array of the pointer to the char that is the start of the line.
+* @param [out] end_lines Pointer to the array of the pointer to the char that is the end of the line.
+* @param [out] count_lines
+* @return
+*/
 int get_lines(char *text, off_t size, char ***start_lines, char ***end_lines, int *count_lines)
 {
         assert(text != NULL);
@@ -106,8 +107,8 @@ int quick_sort(void *start, size_t number, size_t elem_size, int (*comparator)(c
 
 static void choose_sort(void *start, size_t number, size_t elem_size, int (*comparator)(const void *, const void *))
 {
-        assert(start == NULL);
-        assert(comparator);
+        assert(start != NULL);
+        assert(comparator != NULL);
 
         if (number < 2)
                 return;
@@ -131,8 +132,8 @@ static void choose_sort(void *start, size_t number, size_t elem_size, int (*comp
 
 static void recursive_sort(void *start, size_t number, size_t elem_size, int (*comparator)(const void *, const void *))
 {
-        assert(start == NULL);
-        assert(comparator);
+        assert(start != NULL);
+        assert(comparator != NULL);
 
         void *end  = start + elem_size * (number - 1);
         void *left = start;
@@ -172,8 +173,8 @@ static void recursive_sort(void *start, size_t number, size_t elem_size, int (*c
 
 static void two_elem_sort(void *first, size_t elem_size, int (*comparator)(const void *, const void *))
 {
-        assert(first == NULL);
-        assert(comparator);
+        assert(first != NULL);
+        assert(comparator != NULL);
 
         void *second = first + elem_size;
         if (comparator(first, second) == 1)
@@ -182,8 +183,8 @@ static void two_elem_sort(void *first, size_t elem_size, int (*comparator)(const
 
 static void three_elem_sort(void *first, size_t elem_size, int (*comparator)(const void *, const void *))
 {
-        assert(first == NULL);
-        assert(comparator);
+        assert(first != NULL);
+        assert(comparator != NULL);
 
         void *second = first + elem_size;
         void *third  = second + elem_size;
@@ -205,8 +206,8 @@ static void three_elem_sort(void *first, size_t elem_size, int (*comparator)(con
 
 static void insert_sort(void *start, size_t number, size_t elem_size,  int (*comparator)(const void *, const void *))
 {
-        assert(start == NULL);
-        assert(comparator);
+        assert(start != NULL);
+        assert(comparator != NULL);
 
         void *end = start + (number - 1) * elem_size;
         void *ptr_i = start + elem_size;
