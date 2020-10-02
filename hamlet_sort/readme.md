@@ -10,6 +10,7 @@ Project was developed in (and for) Ubuntu 18.04.5 LTS.
 * doxygen (for documentation)
 ### Project assembly
 Execute PATH_TO_THE_REPOSITORY/hamlet_sort/build/build.sh file.
+
 Compiled file will be located: PATH_TO_THE_REPOSITORY/hamlet_sort/build/app
 
 ### Documentation
