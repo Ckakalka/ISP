@@ -6,6 +6,17 @@
 #include <malloc.h>
 
 /**
+ * Pointer to the beginning of the file.
+ */
+static void *begin_file;
+/**
+ * Pointer to the end of the file.
+ */
+static void *end_file;
+
+static const int DIFFERENCE = 'a' - 'A';
+
+/**
  * Maps the file at path \b path to memory. Sets \b text to the beginning of the file.
  * Puts file data at address \b file_info.
  * @param [in] path  The path to the file (absolute or relative).
@@ -40,24 +51,26 @@ int mmap_data(const char *path, char **text, struct stat *file_info)
 }
 
 /**
-* Marks lines of \b text. Each line corresponds to two pointers: to the first symbol and end of line (\\n or last symbol in text).
-* These pointers are placed in address \b start_lines and \b end_lines respectively. Also puts the count of lines in address \b count_lines
+* Marks lines of \b text. Each line corresponds to two pointers: to the first symbol of line.
+* This pointer is placed in address \b start_lines. Also puts the count of lines in address \b count_lines.
+* Replaces \\n with \\0.
 * @param [in] text The text in which the lines are marked (not NULL).
 * @param [in] size The size of the \b text.
 * @param [out] start_lines Address of the array of the pointer to the char that is the start of the line.
-* @param [out] end_lines Pointer to the array of the pointer to the char that is the end of the line.
-* @param [out] count_lines
-* @return
+* @param [out] count_lines Address to which the count of lines will be written.
+* @return Returns 0 on success and -1 on failure.
 */
-int get_lines(char *text, off_t size, char ***start_lines, char ***end_lines, int *count_lines)
+int get_lines(char *text, off_t size, char ***start_lines, int *count_lines)
 {
         assert(text != NULL);
         assert(count_lines != NULL);
         assert(start_lines != NULL);
-        assert(end_lines != NULL);
         if (text == NULL || count_lines == NULL ||
-                start_lines == NULL || end_lines == NULL)
+                start_lines == NULL)
                 return -1;
+
+        if (size == 0)
+                return 0;
 
         *count_lines = 0;
         off_t byte_counter = 0;
@@ -72,29 +85,39 @@ int get_lines(char *text, off_t size, char ***start_lines, char ***end_lines, in
 
 
         *start_lines = calloc(*count_lines, sizeof(**start_lines));
-        *end_lines   = calloc(*count_lines, sizeof(**end_lines));
 
-        *count_lines = 0;
-        byte_counter = 0;
+        **start_lines = text;
+        if (*text == '\n')
+                *text = '\0';
 
-        while (byte_counter < size) {
+        *count_lines = 1;
+        byte_counter = 1;
+
+        off_t size_without_last = size - 1;
+        while (byte_counter < size_without_last) {
                 if (text[byte_counter] == '\n') {
-                        (*start_lines)[*count_lines] = ((*end_lines)[*count_lines - 1]) + sizeof(***start_lines);
-                        (*end_lines)[*count_lines]   = &(text[byte_counter]);
+                        text[byte_counter] = '\0';
+                        (*start_lines)[*count_lines] = &(text[byte_counter + sizeof(char)]);
                         ++(*count_lines);
                 }
                 ++byte_counter;
         }
 
-        **start_lines = text;
-        if (text[byte_counter - 1] != '\n') {
-                (*start_lines)[*count_lines] = ((*end_lines)[*count_lines - 1]) + sizeof(***start_lines);
-                (*end_lines)[*count_lines]   = &(text[byte_counter]);
-                ++(*count_lines);
-        }
+        if (text[size_without_last] == '\n')
+                text[size_without_last] = '\0';
+        begin_file = text;
+        end_file = &(text[size_without_last]);
         return 0;
 }
 
+/**
+ * Sorting the \b number elements length \b elem_size of array from the address \b start by rule \b comparator.
+ * @param start The address from which sorting is performed.
+ * @param number Number of elements to sort.
+ * @param elem_size The size of the element (in bytes).
+ * @param comparator Function to compare elements.
+ * @return Returns 0 on success and -1 on failure.
+ */
 int quick_sort(void *start, size_t number, size_t elem_size, int (*comparator)(const void *, const void *))
 {
         assert(start != NULL);
@@ -103,6 +126,74 @@ int quick_sort(void *start, size_t number, size_t elem_size, int (*comparator)(c
                 return -1;
         choose_sort(start, number, elem_size, comparator);
         return 0;
+}
+
+/**
+ * Byte by byte changes the values at addresses \b first and \b second.
+ * @param first Address of the first element.
+ * @param second Address of the second element.
+ * @param elem_size The size of the element (in bytes).
+ */
+static void swap(void *first, void *second, size_t elem_size)
+{
+        char tmp;
+        for (size_t i = 0; i < elem_size; ++i) {
+                tmp = *((char *)first + i);
+                *((char *)first + i) = *((char *)second + i);
+                *((char*)second + i) = tmp;
+        }
+}
+
+int string_straight_comparator(const void *left, const void *right)
+{
+        char *left_symbol  = *(char **)left;
+        char *right_symbol = *(char **)right;
+        while (1) {
+                while (!(is_end_line(left_symbol) || is_letter(*left_symbol)))
+                        left_symbol += sizeof(char);
+                while (!(is_end_line(right_symbol) || is_letter(*right_symbol)))
+                        right_symbol += sizeof(char);
+
+                if (is_end_line(left_symbol) && is_end_line(right_symbol))
+                        return 0;
+                if (!is_end_line(left_symbol) && is_end_line(right_symbol))
+                        return 1;
+                if (is_end_line(left_symbol) && !is_end_line(right_symbol))
+                        return -1;
+
+                if (abs(*left_symbol - *right_symbol) % DIFFERENCE == 0) {
+                        left_symbol  += sizeof(char);
+                        right_symbol += sizeof(char);
+                        continue;
+                }
+                if (*left_symbol > *right_symbol)
+                        return 1;
+                if (*left_symbol < *right_symbol)
+                        return -1;
+        }
+}
+
+static int abs(int value)
+{
+        if (value < 0)
+                return -value;
+        return value;
+}
+
+static int is_end_line(const void *address)
+{
+        return *(char *)address == '\0' || address > end_file;
+}
+
+static int string_reverse_comparator(const void *left, const void *right)
+{
+
+}
+
+static int is_letter(char symbol)
+{
+        return (('A' <= symbol && symbol <= 'Z')
+             || ('A' <= symbol && symbol <= 'z'));
 }
 
 static void choose_sort(void *start, size_t number, size_t elem_size, int (*comparator)(const void *, const void *))
@@ -221,17 +312,6 @@ static void insert_sort(void *start, size_t number, size_t elem_size,  int (*com
                 ptr_i += elem_size;
         }
 }
-
-void swap(void *first, void *second, size_t elem_size)
-{
-        char tmp;
-        for (size_t i = 0; i < elem_size; ++i) {
-                tmp = *((char *)first + i);
-                *((char *)first + i) = *((char *)second + i);
-                *((char*)second + i) = tmp;
-        }
-}
-
 
 
 
