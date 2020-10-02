@@ -14,7 +14,60 @@ static void *begin_file;
  */
 static void *end_file;
 
-static const int DIFFERENCE = 'a' - 'A';
+/**
+ * Sorts text file \b path line by line. First in straight order, then in reverse. Ignores all characters except Latin.
+ * @param path The path to the file.
+ * @return Returns 0 on success and -1 on failure.
+ */
+int hamlet_sort(const char *path)
+{
+        assert(path != NULL);
+        if (path == NULL)
+                return -1;
+
+        char *text = NULL;
+        struct stat file_info;
+        int rez = mmap_data(path, &text, &file_info);
+        if (rez == -1) {
+                fprintf(stderr, "Open or map error\n");
+                return -1;
+        }
+
+        char **start_lines = NULL;
+        int count_lines = 0;
+        rez = get_lines(text, file_info.st_size, &start_lines, &count_lines);
+
+        if (rez == -1) {
+                fprintf(stderr, "get_lines error\n");
+                return -1;
+        }
+
+        quick_sort(start_lines, count_lines, sizeof(start_lines), &string_straight_comparator);
+        start_to_end_lines(start_lines, count_lines);
+        quick_sort(start_lines, count_lines, sizeof(start_lines), &string_reverse_comparator);
+        end_to_start_lines(start_lines, count_lines);
+
+        for (int i = 0; i < count_lines; ++i) {
+                if (*(start_lines[i]) != '\0')
+                        printf("%s\n", start_lines[i]);
+        }
+
+        for(off_t i = 0; i < file_info.st_size; ++i)
+                if(text[i] == '\0')
+                        text[i] = '\n';
+
+        printf("Original\n");
+
+        printf("%s", text);
+
+        if (munmap((void *)text, file_info.st_size) == -1) {
+                fprintf(stderr, "Unmap error\n");
+                return -1;
+        }
+
+        free(start_lines);
+        return 0;
+}
 
 /**
  * Maps the file at path \b path to memory. Sets \b text to the beginning of the file.
@@ -24,7 +77,7 @@ static const int DIFFERENCE = 'a' - 'A';
  * @param [out] file_info Pointer to the struct stat (not NULL).
  * @return Returns 0 on success and -1 on failure.
  */
-int mmap_data(const char *path, char **text, struct stat *file_info)
+static int mmap_data(const char *path, char **text, struct stat *file_info)
 {
         assert(path != NULL);
         assert(text != NULL);
@@ -59,8 +112,9 @@ int mmap_data(const char *path, char **text, struct stat *file_info)
 * @param [out] start_lines Address of the array of the pointer to the char that is the start of the line.
 * @param [out] count_lines Address to which the count of lines will be written.
 * @return Returns 0 on success and -1 on failure.
+ * \warning Dynamic memory is allocated for the \b start_lines. Do not forget to free it.
 */
-int get_lines(char *text, off_t size, char ***start_lines, int *count_lines)
+static int get_lines(char *text, off_t size, char ***start_lines, int *count_lines)
 {
         assert(text != NULL);
         assert(count_lines != NULL);
@@ -134,7 +188,7 @@ int quick_sort(void *start, size_t number, size_t elem_size, int (*comparator)(c
  * @param second Address of the second element.
  * @param elem_size The size of the element (in bytes).
  */
-static void swap(void *first, void *second, size_t elem_size)
+void swap(void *first, void *second, size_t elem_size)
 {
         char tmp;
         for (size_t i = 0; i < elem_size; ++i) {
@@ -144,7 +198,7 @@ static void swap(void *first, void *second, size_t elem_size)
         }
 }
 
-int string_straight_comparator(const void *left, const void *right)
+static int string_straight_comparator(const void *left, const void *right)
 {
         char *left_symbol  = *(char **)left;
         char *right_symbol = *(char **)right;
@@ -161,23 +215,20 @@ int string_straight_comparator(const void *left, const void *right)
                 if (is_end_line(left_symbol) && !is_end_line(right_symbol))
                         return -1;
 
-                if (abs(*left_symbol - *right_symbol) % DIFFERENCE == 0) {
-                        left_symbol  += sizeof(char);
-                        right_symbol += sizeof(char);
-                        continue;
-                }
-                if (*left_symbol > *right_symbol)
+                if (get_ord_symbol(*left_symbol) > get_ord_symbol(*right_symbol))
                         return 1;
-                if (*left_symbol < *right_symbol)
+                if (get_ord_symbol(*left_symbol) < get_ord_symbol(*right_symbol))
                         return -1;
+                left_symbol  += sizeof(char);
+                right_symbol += sizeof(char);
         }
 }
 
-static int abs(int value)
+static int get_ord_symbol(char symbol)
 {
-        if (value < 0)
-                return -value;
-        return value;
+        if (symbol >= 'A' && symbol <= 'Z')
+                return symbol - 'A';
+        return symbol - 'a';
 }
 
 static int is_end_line(const void *address)
@@ -185,15 +236,61 @@ static int is_end_line(const void *address)
         return *(char *)address == '\0' || address > end_file;
 }
 
+static int is_start_line(const  void *address)
+{
+        return *(char *)address == '\0' || address < begin_file;
+}
+
 static int string_reverse_comparator(const void *left, const void *right)
 {
+        char *left_symbol  = *(char **)left;
+        char *right_symbol = *(char **)right;
+        while (1) {
+                while (!(is_start_line(left_symbol) || is_letter(*left_symbol)))
+                        left_symbol -= sizeof(char);
+                while (!(is_start_line(right_symbol) || is_letter(*right_symbol)))
+                        right_symbol -= sizeof(char);
 
+                if (is_start_line(left_symbol) && is_start_line(right_symbol))
+                        return 0;
+                if (!is_start_line(left_symbol) && is_start_line(right_symbol))
+                        return 1;
+                if (is_start_line(left_symbol) && !is_start_line(right_symbol))
+                        return -1;
+
+                if (get_ord_symbol(*left_symbol) > get_ord_symbol(*right_symbol))
+                        return 1;
+                if (get_ord_symbol(*left_symbol) < get_ord_symbol(*right_symbol))
+                        return -1;
+                left_symbol  -= sizeof(char);
+                right_symbol -= sizeof(char);
+        }
+}
+
+static void start_to_end_lines(char **start_lines, int count_lines)
+{
+        for (int i = 0; i < count_lines; ++i)
+                if (*(start_lines[i]) != '\0') {
+                        while(!(start_lines[i] > (char *)end_file || *(start_lines[i]) == '\0'))
+                                start_lines[i] += sizeof(char);
+                        start_lines[i] -= sizeof(char);
+                }
+}
+
+static void end_to_start_lines(char **end_lines, int count_lines)
+{
+        for (int i = 0; i < count_lines; ++i)
+                if (*(end_lines[i]) != '\0') {
+                        while(!(end_lines[i] < (char *)begin_file || *(end_lines[i]) == '\0'))
+                                end_lines[i] -= sizeof(char);
+                        end_lines[i] += sizeof(char);
+                }
 }
 
 static int is_letter(char symbol)
 {
         return (('A' <= symbol && symbol <= 'Z')
-             || ('A' <= symbol && symbol <= 'z'));
+             || ('a' <= symbol && symbol <= 'z'));
 }
 
 static void choose_sort(void *start, size_t number, size_t elem_size, int (*comparator)(const void *, const void *))

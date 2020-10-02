@@ -1,6 +1,11 @@
+/**
+ * @file hamlet_sort_tests.c
+ * The file for hamlet_sort tests.
+ */
 #include "../../Unity/src/unity.h"
 #include "hamlet_sort.h"
 
+// TODO Tests
 int comparator(const void *left, const void *right)
 {
         if ((*(int *)left) > (*(int *) right))
