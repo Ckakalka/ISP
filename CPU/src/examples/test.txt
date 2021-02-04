@@ -1,0 +1,18 @@
+push 5
+pop
+push 2
+pop ax
+push 41
+
+call lbl 1
+out
+push ax
+out
+stop
+
+lbl:
+out
+push 5
+push 5
+pop ax
+ret 1

@@ -1,0 +1,11 @@
+push 0.5
+push 3.01
+push 3.42
+ja lbl
+out
+stop
+
+lbl:
+sin
+out
+stop

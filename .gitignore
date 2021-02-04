@@ -33,7 +33,6 @@ cmake-build-debug/
 *.dylib
 
 # Executables
-*.exe
 *.out
 *.app
 *.i*86
