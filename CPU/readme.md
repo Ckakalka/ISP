@@ -1,6 +1,6 @@
 # Processor
 
-Simple processor realisation with assembler and disassembler.
+Simple processor realisation with assembler.
 
 ## Build
 
