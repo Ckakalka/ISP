@@ -6,19 +6,19 @@ Simple processor realisation with assembler and disassembler.
 
 You can build a project from under clion using mingw
 
-I couldn't build it directly using cmake
+I couldn't build it directly using cmake :(
 
 ## Run
 Run CPU, filename is path to code in pseudo-asm
 
-    out/processor.exe <filename>
+    processor/processor.exe <filename>
 
 ----
 
 Run assembler, input is path to file with code in pseudo-asm,
 output - path to file where bytecodes will be written
 
-    out/assembler.exe <input> <output>
+    assembler/assembler.exe <input> <output>
 
 ----
 
